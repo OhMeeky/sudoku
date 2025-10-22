@@ -3,11 +3,46 @@
 import { useNumberContext } from './NumberContext';
 import { useState } from "react";
 import Box from "./Box";
+import { useEffect } from "react";
+
+
+
 
 export default function BoxGrid() {
   const boxPosition = Array.from({ length: 81 }, (_, i) => i + 1);
   const { selectedNumber } = useNumberContext();
   const [boxContents, setBoxContents] = useState(Array(81).fill(0));
+
+const gridPrefill = () => {
+  let newContents = [...boxContents];
+  let availablePositions = [...boxPosition];
+
+
+  let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  while (availablePositions.length > 0 && numbers.length > 0) {
+
+    const posIndex = Math.floor(Math.random() * availablePositions.length);
+    const pos = availablePositions[posIndex];
+
+    const numIndex = Math.floor(Math.random() * numbers.length);
+    const num = numbers[numIndex];
+
+    const tempContents = [...newContents];
+    tempContents[pos] = num;
+
+    if (checkBox(tempContents)) {
+      newContents = tempContents;
+      setBoxContents(newContents);
+
+      availablePositions.splice(posIndex, 1);
+      numbers.splice(numIndex, 1);
+
+      console.log(`Metto il numero ${num} nella cella pos: ${pos}`);
+    } 
+  }
+};
+
 
   const chooseBox = (pos: number) => {
     const newContents = [...boxContents];
@@ -84,8 +119,13 @@ export default function BoxGrid() {
       alert("Congratulazioni!");
     } else {
       alert("Non funzionante");
-    }
+    }    
   }
+
+  useEffect(() => {
+    gridPrefill();
+  }, []);
+
 
   return (
     <div className="relative min-h-screen text-white flex items-center justify-center">
